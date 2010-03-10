@@ -12,7 +12,6 @@ import medopoker.log.Log;
 import medopoker.logic.Card;
 import medopoker.logic.Util.LogList;
 import medopoker.logic.Util.LogList.LogElement;
-import medopoker.flow.Player;
 
 /**
  *
@@ -20,26 +19,49 @@ import medopoker.flow.Player;
  */
 public class PokerCanvas  extends GameCanvas {
 
+	private ClientManager cm;
+
 	private String img_path = "/resources/";
 	private Image[][] card_imgs;
 	private Image table_img;
 
 	//private Thread thread;
 	private Graphics g;
-	private Image bg;
+	private Image bg_pattern;
+	private Image background;
 	int screen_width;
 	int screen_height;
 
-	Card[] on_table;
-	Card[] hole;
-	private LogList log;
-	
 	final int CARD_WIDTH = 50;
 	final int CARD_HEIGHT = 68;
 
 
-	public PokerCanvas () {
+	public static String[] actions = {"FOLD", "CHECK", "CALL", "RAISE"};
+
+	/////////
+
+	public boolean initialized = false;
+
+	public Player[] players = null;
+	private Card[] hole = null;
+	private Card[] on_table = null;
+	private int cards_shown = 0;
+	private LogList log;
+
+	private int choice = 0;
+	public boolean choices_shown = false;
+
+	private int current_action = -1;
+	private int current_player = -1;
+
+	private String pot = null;
+	/////////
+
+
+	public PokerCanvas (ClientManager cm) {
 		super(true);
+		this.cm = cm;
+
 		Log.notify("PokerCanvas constructor");
 		g = getGraphics();
 
@@ -48,39 +70,91 @@ public class PokerCanvas  extends GameCanvas {
 		//screen_width = 176;
 		//screen_height =	220;
 
-		log = new LogList(3);
-		log.append("First!");
-		log.append("Second!");
-		log.append("Third!");
-		log.append("Fourth!");
-		log.append("Nejc won the pot!");
-		log.append("Mistake! He didn't!");
-		log.append("End of Log");
-		
+		log = new LogList();
+		log.append("Game initialized");
+
 		try {
 			loadImages();
+			createBG();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void paintFresh() {
-		Log.notify("PokerCanvas paintFresh()");
-		paintBG();
-		//paintHole(hole);
+	/////////////////////////////////////////////////
+
+	public void updatePlayers(Player[] ps) {
+		players = ps;
+		paintMiddle();
+		flushGraphics();
+	}
+
+	public void newHole(Card[] cs) {
+		hole = cs;
+		paintHole();
+		flushGraphics();
+	}
+
+	public void newOnTable(Card[] cs) {
+		on_table = cs;
+		cards_shown = 3;
+		redraw();
+	}
+
+	public void showMoreCards() {
+		paintCardsToTable(on_table, ++cards_shown);
+		flushGraphics();
+	}
+
+	public void getAction() {
+		choices_shown = true;
+		redraw();
+	}
+
+	public void currentAction(int a, int p) {
+		current_action = a;
+		current_player = p;
+		paintMiddle();
+	}
+
+	public void updatePot(String f) {
+		pot = f;
+		paintMiddle();
+	}
+
+	public void appendToLog(String s) {
+		log.append(s);
 		paintLog();
 		flushGraphics();
 	}
 
-	public void paintHole(Card[] c) {
-		Image c1 = card_imgs[c[0].getSuit()][c[0].getRank()];
-		Image c2 = card_imgs[c[1].getSuit()][c[1].getRank()];
+	/////////////////////////////////////////////////
+
+	public void redraw() {
+		Log.notify("PokerCanvas redraw()");
+		if (initialized) {
+			paintBG();
+			if (hole != null) paintHole();
+			if (on_table != null) paintCardsToTable(on_table, cards_shown);
+			if (players != null) paintMiddle();
+			paintLog();
+			if (choices_shown) paintChoices();
+			flushGraphics();
+		} else {
+			g.setColor(0,0,0);
+			g.drawString("Loading...", 10, 10, 0);
+		}
+	}
+
+	private void paintHole() {
+		Image c1 = card_imgs[hole[0].getSuit()][hole[0].getRank()];
+		Image c2 = card_imgs[hole[1].getSuit()][hole[1].getRank()];
 		g.drawImage(c1, 0, screen_height, Graphics.BOTTOM|Graphics.LEFT);
 		g.drawImage(c2, c1.getWidth()/3,screen_height, Graphics.BOTTOM|Graphics.LEFT);
 		flushGraphics();
 	}
 
-	public void paintCardsToTable(Card[] c, int howMany) {
+	private void paintCardsToTable(Card[] c, int howMany) {
 		for (int i=0; i<howMany; i++) {
 			if (c[i]==null) break;
 			Image img = card_imgs[c[i].getSuit()][c[i].getRank()];
@@ -90,22 +164,36 @@ public class PokerCanvas  extends GameCanvas {
 		}
 	}
 
-	public void paintPlayer(Player p, int i) {
+	private void paintMiddle() {
+		paintBG(CARD_HEIGHT, screen_height-CARD_HEIGHT);
+		g.setColor(255,255,255);
+		if (pot != null) g.drawString(pot, screen_width/2, screen_height/2+5, Graphics.BASELINE|Graphics.HCENTER);
+		for (int i=0; i<players.length; i++) {
+			paintPlayer(players[i], i);
+			Log.notify("drawing player"+players[i].getName());
+		}
+		if (current_player != -1) paintPlayerAction(current_action, current_player);
+	}
+
+	private void paintPlayer(Player p, int i) {
 		// painting player info
+		Log.notify("paintPlayer "+p.getName());
 		int board_height = screen_height - 2*CARD_HEIGHT;
 		int[] anchors = new int[]{4|16, 8|16, 8|32, 4|32};
 		Font font_name = Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_BOLD, Font.SIZE_MEDIUM);
 		Font font_money = Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, Font.SIZE_SMALL);
 		int x = (i>0&&i<3)? screen_width-5 : 5;
 		int y = (i<2)? CARD_HEIGHT+5 : CARD_HEIGHT + board_height - 5;
+		g.setColor(0,0,0);
 		g.setFont(font_name);
 		g.drawString(p.getName(), x, y, anchors[i]);
 		g.setFont(font_money);
 		g.drawString(p.getMoney()+"", x, y+font_name.getHeight()*(i<2?1:-1), anchors[i]);
+		flushGraphics();
+		Log.notify("all good");
 	}
 
-	public void paintPlayerAction(int action, int i) {
-		String[] actions = {"FOLD", "CHECK", "CALL", "RAISE"};
+	private void paintPlayerAction(int action, int i) {
 		int board_height = screen_height - 2*CARD_HEIGHT;
 		int[] anchors = new int[]{4|16, 8|16, 8|32, 4|32};
 		int x = (i>0&&i<3)? screen_width-25 : 25;
@@ -115,9 +203,10 @@ public class PokerCanvas  extends GameCanvas {
 		//g.setColor(2,32,0);
 		g.setColor(255,51,36);
 		g.drawString(actions[action], x, y, anchors[i]);
+		flushGraphics();
 	}
 
-	public void paintLog() {
+	private void paintLog() {
 		int x_offset = CARD_WIDTH + CARD_WIDTH/3 + 3;
 		int y_offset = screen_height - CARD_HEIGHT;
 		int width = screen_width-x_offset-2;
@@ -138,39 +227,46 @@ public class PokerCanvas  extends GameCanvas {
 			g.drawString(e.value(), x_offset+2, y_offset+5+(line*f.getHeight()), Graphics.BOTTOM|Graphics.LEFT);
 			line--;
 		} while (((e = e.getNext()) != null) && line!=0 );
-	}
-
-	public void addToLog(String s) {
-		log.append(s);
-		paintLog();
 		flushGraphics();
 	}
 
-	public void paintBG() {
-		Log.notify("PokerCanvas paintBG()");
-		int img_width = bg.getWidth();
-		int img_height = bg.getHeight();
+	private void createBG() {
+		background = Image.createImage(screen_width, screen_height);
+		Graphics bg_g = background.getGraphics();
+		int img_width = bg_pattern.getWidth();
+		int img_height = bg_pattern.getHeight();
 		int x = 0;
 		int y = 0;
 		while (y < screen_height) {
 			x = 0;
 			while (x < screen_width) {
-				g.drawImage(bg, x, y, 0);
+				bg_g.drawImage(bg_pattern, x, y, 0);
 				x+=img_width;
 			}
 			y+=img_height;
 		}
-		paintTable();
-	}
 
-	public void paintTable() {
-		int board_height = screen_height - 2*CARD_HEIGHT;
 		int x_center = screen_width/2;
-		int y_center = CARD_HEIGHT + (board_height/2);
-		g.drawImage(table_img, x_center, y_center, Graphics.VCENTER|Graphics.HCENTER);
+		int y_center = screen_height/2;
+		bg_g.drawImage(table_img, x_center, y_center, Graphics.VCENTER|Graphics.HCENTER);
+
 	}
 
-	public void paintChoices() {
+	private void paintBG() {
+		paintBG(0,screen_height);
+	}
+
+	private void paintBG(int from, int to) {
+		try {
+			Log.notify("drawing bg...");
+			g.drawRegion(background, 0, from, screen_width, to-from, 0, 0, from, Graphics.TOP|Graphics.LEFT);
+			//g.drawRegion(background, 0, 0, 100, 100, 0, 0, 0, Graphics.TOP|Graphics.LEFT);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void paintChoices() {
 		int y_offset = screen_height - CARD_HEIGHT/2;
 		int width = screen_width-1;
 		int height = CARD_HEIGHT/2+5;
@@ -184,11 +280,12 @@ public class PokerCanvas  extends GameCanvas {
 
 		g.setFont(Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_BOLD, Font.SIZE_LARGE));
 		Log.notify("got font");
-		g.drawString("CALL", width/2, screen_height-height/4, Graphics.BASELINE|Graphics.HCENTER);
+		g.drawString(actions[choice], width/2, screen_height-height/4, Graphics.BASELINE|Graphics.HCENTER);
 		Log.notify("drew string");
+		flushGraphics();
 	}
-	
-	public void drawArrow(int x, int y, boolean left) {
+
+	private void drawArrow(int x, int y, boolean left) {
 		if (left) {
 			g.drawLine(x, y, x+2, y-2);
 			g.drawLine(x, y, x+2, y+2);
@@ -200,7 +297,7 @@ public class PokerCanvas  extends GameCanvas {
 
 	protected void showNotify() {
 		Log.notify("showNotify()");
-		paintFresh();
+		redraw();
 		//thread = new Thread(this);
 		//thread.start();
 	}
@@ -214,25 +311,23 @@ public class PokerCanvas  extends GameCanvas {
 		}
 
 		table_img = Image.createImage(img_path+"table.png");
-		bg = Image.createImage("/resources/stripe.png");
+		bg_pattern = Image.createImage("/resources/stripe.png");
 	}
 
-/*	public void run() {
-		Log.notify("Run()");
-		
-		try {
-			Thread.sleep(1000);
-			log.append("Haha!");
-			paintLog(); flushGraphics();
-			Thread.sleep(1000);
-			log.append("Dela!");
-			paintLog(); flushGraphics();
-			Thread.sleep(1000);
-			paintChoices(); flushGraphics();
-		} catch (InterruptedException ex) {
-			ex.printStackTrace();
+	protected void keyPressed(int key) {
+		Log.notify("Key pressed: " + key);
+		if (choices_shown)
+		switch(key) {
+			case 52: if(choice!=0) choice--; paintChoices(); break;
+			case 54: if(choice!=3) choice++; paintChoices(); break;
+			case 53:
+				choices_shown = false;
+				cm.sendAction(choice+"");
+				//paintBG(screen_height-CARD_HEIGHT, screen_height);
+				//paintHole();
+				//paintLog();
+				redraw();
+				break;
 		}
 	}
-*/
-
 }

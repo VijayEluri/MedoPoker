@@ -23,15 +23,14 @@ public class ClientManager implements Runnable {
 	private PokerCanvas PCanvas;
 	private String msg;
 
-	private Card[] on_table;
-	private int cards_on_table = 3;
-
 	private Player[] players;
+	private Card[] hole;
+	private Card[] on_table;
 
 	public ClientManager(Device dev, MIDlet m) {
 		d = dev;
 		disp = Display.getDisplay(m);
-		PCanvas = new PokerCanvas();
+		PCanvas = new PokerCanvas(this);
 		Thread t = new Thread(this);
 		t.start();
 		System.out.println("CM running");
@@ -54,11 +53,15 @@ public class ClientManager implements Runnable {
 		boolean running = true;
 		while(running) {
 			msg = d.recieve();
-			if (msg.equals("PU")) recievePU();
-			if (msg.equals("UH")) recieveUH();
-			if (msg.equals("ST")) recieveST();
-			if (msg.equals("UT")) recieveUT();
-			if (msg.equals("LU")) recieveLU();
+			if (msg.equals("PU")) recievePU(); // Player Update
+			if (msg.equals("UH")) recieveUH(); // Update Hand
+			if (msg.equals("ST")) recieveST(); // Set Table
+			if (msg.equals("UT")) recieveUT(); // Update Table
+			if (msg.equals("UPOT")) recieveUPOT(); // Update Pot
+			if (msg.equals("LU")) recieveLU(); // Log Update
+			if (msg.equals("RA")) recieveRA(); // Recieve Action
+			if (msg.equals("AA")) recieveAA(); // Announce Action
+			if (msg.equals("PLAY")) recievePLAY(); // Start the game
 			if (msg.equals("EXIT")) running=false;
 		}
 
@@ -74,9 +77,7 @@ public class ClientManager implements Runnable {
 			players[Integer.parseInt(split(msg)[0])] = new Player(split(msg)[1], 0);
 			Log.notify("creating player");
 		}
-		for (int i=0; i<players.length; i++) {
-			PCanvas.paintPlayer(players[i], i);
-		}
+		PCanvas.updatePlayers(players);
 	}
 
 	private void recievePU() {
@@ -84,15 +85,16 @@ public class ClientManager implements Runnable {
 			msg = d.recieve();
 			players[Integer.parseInt(split(msg)[0])].setMoney(Float.parseFloat(split(msg)[1]));
 		}
+		PCanvas.updatePlayers(players);
 	}
 
 	private void recieveUH() {
-		Card[] hole = new Card[2];
+		hole = new Card[2];
 		for (int i=0; i<2; i++) {
 			msg = d.recieve();
 			hole[i] = new Card(Integer.parseInt(split(msg)[0]), Integer.parseInt(split(msg)[1]));
 		}
-		PCanvas.paintHole(hole);
+		PCanvas.newHole(hole);
 	}
 
 	private void recieveST() {
@@ -101,17 +103,48 @@ public class ClientManager implements Runnable {
 			msg = d.recieve();
 			on_table[i] = new Card(Integer.parseInt(split(msg)[0]), Integer.parseInt(split(msg)[1]));
 		}
-		cards_on_table = 3;
-		PCanvas.paintCardsToTable(on_table, cards_on_table);
+		PCanvas.newOnTable(on_table);
 	}
 
 	private void recieveUT() {
-		PCanvas.paintCardsToTable(on_table, ++cards_on_table);
+		PCanvas.showMoreCards();
+	}
+
+	private void recieveUPOT() {
+		msg = d.recieve();
+		PCanvas.updatePot(msg);
 	}
 
 	private void recieveLU() {
 		msg = d.recieve();
-		PCanvas.addToLog(msg);
+		PCanvas.appendToLog(msg);
+	}
+
+	private void recieveRA() {
+		PCanvas.getAction();
+	}
+
+	private void recieveAA() {
+		msg = d.recieve();
+		int p = Integer.parseInt(split(msg)[0]);
+		int a = Integer.parseInt(split(msg)[1]);
+		float amount = Float.parseFloat(split(msg)[2]);
+		String s = players[p].getName() + " " + PokerCanvas.actions[a];
+		if (amount != 0.0) s = s + " " + amount;
+		PCanvas.appendToLog(s);
+		PCanvas.currentAction(a, p);
+	}
+	
+	private void recievePLAY() {
+		PCanvas.initialized = true;
+		PCanvas.redraw();
+	}
+
+
+	/////////////////////////////
+
+	public void sendAction(String a) {
+		d.send(a);
 	}
 
 	private String[] split(String original) {

@@ -19,12 +19,16 @@ public class ServerManager implements Runnable {
 	private final float STARTING_MONEY = 200.0f;
 	private final float SB = 5.0f;
 
+	private float pot = 0.0f;
+
 	private Vector deviceList;
 	private Player[] players;
 	private Thread t;
 
 	private Card[] deck;
 	private Card[] on_table;
+
+	private String[] actions = {"FOLD", "CHECK", "CALL", "RAISE"};
 
 	public ServerManager(Vector dl) {
 		deviceList = dl;
@@ -49,6 +53,15 @@ public class ServerManager implements Runnable {
 		dealCards();
 		updateHand();
 		setTable();
+		startPlay();
+		updatePot();
+
+		int a = requestAction(0);
+		Log.notify("Action: "+a+" from player 0");
+		announceAction(0, a, 0.0f);
+
+		a = requestAction(1);
+		announceAction(1, a, 0.0f);
 
 		broadcast("EXIT");
 	}
@@ -103,10 +116,31 @@ public class ServerManager implements Runnable {
 		broadcast("UT"); // update table
 	}
 
+	private void updatePot() {
+		broadcast("UPOT");
+		broadcast(String.valueOf(pot));
+	}
+
 	private void logUpdate(String s) {
 		broadcast("LU");
 		broadcast(s);
 	}
+	
+	private int requestAction(int i) {
+		sendTo(i, "RA");
+		return Integer.parseInt(recieveFrom(i));
+	}
+
+	private void startPlay() {
+		broadcast("PLAY");
+	}
+
+	private void announceAction(int player, int action, float amount) {
+		broadcast("AA");
+		broadcast(player+":"+action+":"+amount);
+	}
+
+//////////////////////////////////////////////////////
 
 	public void addLocalDevice(Device d) {
 		deviceList.addElement(d);
@@ -119,8 +153,8 @@ public class ServerManager implements Runnable {
 		}
 	}
 
-	public void recieveFrom(int i) {
-		((Device)deviceList.elementAt(i)).recieve();
+	public String recieveFrom(int i) {
+		return ((Device)deviceList.elementAt(i)).recieve();
 	}
 	
 	public void sendTo(int i, String msg) {

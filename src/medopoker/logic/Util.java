@@ -158,12 +158,8 @@ public class Util {
 	}
 
 	public static class LogList {
-		int size;
+		
 		LogElement first;
-
-		public LogList(int size) {
-			this.size = size;
-		}
 
 		public void append(String s) {
 			first = new LogElement(s, first);
