@@ -61,7 +61,8 @@ public class ClientManager implements Runnable {
 			if (msg.equals("LU")) recieveLU(); // Log Update
 			if (msg.equals("RA")) recieveRA(); // Recieve Action
 			if (msg.equals("AA")) recieveAA(); // Announce Action
-			if (msg.equals("PLAY")) recievePLAY(); // Start the game
+			if (msg.equals("SR")) recieveSR(); // Start the round
+			if (msg.equals("ER")) recieveER(); // End the round
 			if (msg.equals("EXIT")) running=false;
 		}
 
@@ -135,9 +136,13 @@ public class ClientManager implements Runnable {
 		PCanvas.currentAction(a, p);
 	}
 	
-	private void recievePLAY() {
+	private void recieveSR() {
 		PCanvas.initialized = true;
 		PCanvas.redraw();
+	}
+
+	private void recieveER() {
+		PCanvas.initialized = false;
 	}
 
 

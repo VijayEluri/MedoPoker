@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package medopoker.flow;
 
 import medopoker.logic.Card;
@@ -10,13 +5,12 @@ import medopoker.network.Device;
 
 /**
  *
- * @author Martin
+ * @author Nejc
  */
 public class Player {
 	private Device device;
 	private String name;
-	private float money;
-	private Card[] currentHole;
+	protected float money;
 
 	public Player(String n, float m) {
 		name = n;
@@ -33,13 +27,5 @@ public class Player {
 
 	public void setMoney(float m) {
 		money = m;
-	}
-
-	public void dealHole(Card[] hole) {
-		currentHole = hole;
-	}
-
-	public Card[] getHole() {
-		return currentHole;
 	}
 }

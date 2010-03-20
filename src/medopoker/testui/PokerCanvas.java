@@ -52,7 +52,7 @@ public class PokerCanvas  extends GameCanvas implements Runnable {
 		hole = new Card[]{(new Card(2,12)), (new Card(1,12))};
 
 
-		log = new LogList(3);
+		log = new LogList();
 		log.append("First!");
 		log.append("Second!");
 		log.append("Third!");

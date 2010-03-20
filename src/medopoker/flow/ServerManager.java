@@ -22,22 +22,22 @@ public class ServerManager implements Runnable {
 	private float pot = 0.0f;
 
 	private Vector deviceList;
-	private Player[] players;
+	private ServerPlayer[] players;
 	private Thread t;
 
 	private Card[] deck;
 	private Card[] on_table;
 
-	private String[] actions = {"FOLD", "CHECK", "CALL", "RAISE"};
+	private String[] actions = {"FOLD", "CHECK", "CALL", "RAISE", "SB", "BB"};
 
 	public ServerManager(Vector dl) {
 		deviceList = dl;
 	}
 
 	public void startGame() {
-		players = new Player[deviceList.size()];
+		players = new ServerPlayer[deviceList.size()];
 		for (int i=0; i<players.length; i++) {
-			players[i] = new Player(((Device)deviceList.elementAt(i)).getFriendlyName(), STARTING_MONEY);
+			players[i] = new ServerPlayer(((Device)deviceList.elementAt(i)).getFriendlyName(), STARTING_MONEY);
 		}
 
 		t = new Thread(this);
@@ -46,6 +46,7 @@ public class ServerManager implements Runnable {
 
 
 	public void run() {
+		/* TEST
 		broadcast("START");
 		playerInit();
 		playerUpdate();
@@ -64,6 +65,88 @@ public class ServerManager implements Runnable {
 		announceAction(1, a, 0.0f);
 
 		broadcast("EXIT");
+		*/
+
+		broadcast("START");
+		playerInit();
+
+		boolean running = true;
+		int dealer = 0;
+		while (running) {
+			pot = 0;
+			
+			playerUpdate();
+			dealCards();
+			updateHand();
+			setTable();
+			updatePot();
+
+			startRound();
+
+			int i = dealer;
+			float highest_bet = 2*SB;
+			// SB & BB
+			i = increment(i);
+			players[i].put(SB);
+			pot+=SB;
+			announceAction(i, 4, SB);
+			i = increment(i);
+			players[i].put(2*SB);
+			pot+=2*SB;
+			announceAction(i, 5, 2*SB);
+			int highest_better = i;
+			i = increment(i);
+
+			playerUpdate();
+			updatePot();
+			
+			for(int r=0; r<3; r++) {
+
+				if (r != 0) i = increment(dealer);
+
+				do {
+					int a = requestAction(i);
+					switch(a) {
+						case 0:
+							players[i].setIngame(false);
+							break;
+						case 1:
+							if (players[i].getMoneyIn() != highest_bet) {
+								players[i].setIngame(false);
+							}
+							break;
+						case 2:
+							float amount = highest_bet-players[i].getMoneyIn();
+							System.out.println("amount: "+amount+" moneyIn: "+players[i].getMoneyIn());
+							pot+=amount;
+							players[i].put(amount);
+							break;
+						case 3:
+							players[i].put(SB);
+							highest_bet += SB;
+							highest_better = i;
+							pot+=SB;
+							break;
+					}
+					announceAction(i, a, 0.0f);
+					playerUpdate();
+					updatePot();
+					i = increment(i);
+
+				} while (i!=highest_better||(r==0&&i==highest_better)?true:false);
+
+				if (r != 2) updateTable();
+			}
+
+			//showdown
+
+			endRound();
+		}
+		broadcast("EXIT");
+	}
+
+	private int increment(int i) {
+		return (i+1)%players.length;
 	}
 
 	private void playerInit() {
@@ -131,8 +214,12 @@ public class ServerManager implements Runnable {
 		return Integer.parseInt(recieveFrom(i));
 	}
 
-	private void startPlay() {
-		broadcast("PLAY");
+	private void startRound() {
+		broadcast("SR");
+	}
+
+	private void endRound() {
+		broadcast("ER");
 	}
 
 	private void announceAction(int player, int action, float amount) {

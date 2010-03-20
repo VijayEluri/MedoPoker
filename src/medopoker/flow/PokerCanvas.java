@@ -36,7 +36,7 @@ public class PokerCanvas  extends GameCanvas {
 	final int CARD_HEIGHT = 68;
 
 
-	public static String[] actions = {"FOLD", "CHECK", "CALL", "RAISE"};
+	public static String[] actions = {"FOLD", "CHECK", "CALL", "RAISE", "SB", "BB"};
 
 	/////////
 
