@@ -45,7 +45,7 @@ public class ServerPlayer extends Player {
 		money+=f;
 	}
 
-	public void loose() {
+	public void reset_round() {
 		money_in = 0;
 	}
 

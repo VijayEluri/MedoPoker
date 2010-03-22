@@ -56,6 +56,9 @@ public class ServerManager implements Runnable {
 		int dealer = 0;
 		while (running) {
 			pot = 0;
+            for (int i=0; i<players.length; i++) {
+                players[i].reset_round();
+            }
 			
 			playerUpdate();
 			dealCards();
@@ -137,7 +140,7 @@ public class ServerManager implements Runnable {
 					i = increment(i);
 
                     if (i==highest_better) round_finished = true;
-                    if (r==0 && i==big_blind) {
+                    if (r==0 && i==big_blind && a == 3) {  // if the BB guy raises
                         round_finished = false;
                         big_blind = -1;
                     }
