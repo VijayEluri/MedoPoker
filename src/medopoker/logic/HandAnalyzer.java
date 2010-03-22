@@ -30,7 +30,7 @@ public class HandAnalyzer {
 		System.out.println("HIGHEST: " + highest.toString());
 	}
 
-	public void analyze() {
+	public Hand analyze() {
 		Card[] sub;
 		
 		Card.sortByRank(cards);
@@ -81,11 +81,11 @@ public class HandAnalyzer {
 		}
 
 		// Straight
-		System.out.println(cards.length);
+		//System.out.println(cards.length);
 		Card[] str = Card.singleRanks(cards);
 		Card.sortByRank(str);
 
-		System.out.println(str.length);
+		//System.out.println(str.length);
 		for (int i=0; i<=(str.length-5); i++) {
 			sub = (Card[])Util.subList(str, i, i+5);
 			if (isStraight(sub)) {
@@ -93,6 +93,7 @@ public class HandAnalyzer {
 			}
 		}
 
+        return highest;
 	}
 	
 	public boolean isStraight(Card[] cards) {

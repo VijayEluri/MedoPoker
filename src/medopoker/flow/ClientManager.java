@@ -33,7 +33,7 @@ public class ClientManager implements Runnable {
 		PCanvas = new PokerCanvas(this);
 		Thread t = new Thread(this);
 		t.start();
-		System.out.println("CM running");
+		Log.notify("CM running");
 	}
 
 	public void run() {
@@ -59,7 +59,8 @@ public class ClientManager implements Runnable {
 			if (msg.equals("UT")) recieveUT(); // Update Table
 			if (msg.equals("UPOT")) recieveUPOT(); // Update Pot
 			if (msg.equals("LU")) recieveLU(); // Log Update
-			if (msg.equals("RA")) recieveRA(); // Recieve Action
+			if (msg.equals("RA")) recieveRA(); // Request Action
+			if (msg.equals("RR")) recieveRR(); // Request Raise
 			if (msg.equals("AA")) recieveAA(); // Announce Action
 			if (msg.equals("SR")) recieveSR(); // Start the round
 			if (msg.equals("ER")) recieveER(); // End the round
@@ -123,6 +124,12 @@ public class ClientManager implements Runnable {
 
 	private void recieveRA() {
 		PCanvas.getAction();
+	}
+
+	private void recieveRR() {
+        float hb = Float.parseFloat(d.recieve());
+        float bb = Float.parseFloat(d.recieve());
+		PCanvas.getRaise(hb, bb);
 	}
 
 	private void recieveAA() {

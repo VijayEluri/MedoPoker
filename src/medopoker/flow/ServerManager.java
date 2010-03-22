@@ -8,6 +8,8 @@ package medopoker.flow;
 import java.util.Vector;
 import medopoker.log.Log;
 import medopoker.logic.*;
+import medopoker.logic.Util.Comparator;
+import medopoker.logic.Util.HandComparator;
 import medopoker.network.Device;
 
 /**
@@ -46,26 +48,6 @@ public class ServerManager implements Runnable {
 
 
 	public void run() {
-		/* TEST
-		broadcast("START");
-		playerInit();
-		playerUpdate();
-
-		dealCards();
-		updateHand();
-		setTable();
-		startPlay();
-		updatePot();
-
-		int a = requestAction(0);
-		Log.notify("Action: "+a+" from player 0");
-		announceAction(0, a, 0.0f);
-
-		a = requestAction(1);
-		announceAction(1, a, 0.0f);
-
-		broadcast("EXIT");
-		*/
 
 		broadcast("START");
 		playerInit();
@@ -85,6 +67,7 @@ public class ServerManager implements Runnable {
 
 			int i = dealer;
 			float highest_bet = 2*SB;
+            float per_player_in = 0;
 			// SB & BB
 			i = increment(i);
 			players[i].put(SB);
@@ -94,51 +77,104 @@ public class ServerManager implements Runnable {
 			players[i].put(2*SB);
 			pot+=2*SB;
 			announceAction(i, 5, 2*SB);
+            
 			int highest_better = i;
+            int big_blind = i;
 			i = increment(i);
+
+            int players_ingame = players.length;
 
 			playerUpdate();
 			updatePot();
 			
 			for(int r=0; r<3; r++) {
 
-				if (r != 0) i = increment(dealer);
+				if (r != 0) {
+                    i = increment(dealer);
+                    highest_better = i;
+                    highest_bet = 0;
+                }
+
+                boolean round_finished = false;
 
 				do {
+                    if (!players[i].isIngame()) continue;
 					int a = requestAction(i);
+                    float amount;
 					switch(a) {
-						case 0:
+						case 0: // FOLD
 							players[i].setIngame(false);
+                            players_ingame--;
+                            announceAction(i, a, 0.0f);
 							break;
-						case 1:
-							if (players[i].getMoneyIn() != highest_bet) {
+						case 1: // CHECK
+							if (players[i].getMoneyIn() != per_player_in+highest_bet) {
 								players[i].setIngame(false);
+                                players_ingame--;
+                                a = 0;
 							}
+                            announceAction(i, a, 0.0f);
 							break;
-						case 2:
-							float amount = highest_bet-players[i].getMoneyIn();
-							System.out.println("amount: "+amount+" moneyIn: "+players[i].getMoneyIn());
+						case 2: // CALL
+							amount = per_player_in+highest_bet-players[i].getMoneyIn();
+							Log.notify("amount: "+amount+" moneyIn: "+players[i].getMoneyIn());
 							pot+=amount;
 							players[i].put(amount);
+                            announceAction(i, a, amount);
 							break;
-						case 3:
-							players[i].put(SB);
-							highest_bet += SB;
+						case 3: // RAISE
+                            float raise = (requestRaise(i, highest_bet, SB)+1)*SB + highest_bet;
+                            Log.notify("Raise: " + raise);
+							pot+=(per_player_in+raise-players[i].getMoneyIn());
+							players[i].put(per_player_in+raise-players[i].getMoneyIn());
+							highest_bet = raise;
 							highest_better = i;
-							pot+=SB;
+                            announceAction(i, a, raise);
 							break;
 					}
-					announceAction(i, a, 0.0f);
 					playerUpdate();
 					updatePot();
 					i = increment(i);
 
-				} while (i!=highest_better||(r==0&&i==highest_better)?true:false);
+                    if (i==highest_better) round_finished = true;
+                    if (r==0 && i==big_blind) {
+                        round_finished = false;
+                        big_blind = -1;
+                    }
 
+				//} while (!round_finished || (r==0&&i==big_blind)?true:false);
+                } while (!round_finished);
+
+                per_player_in += highest_bet;
+                if (players_ingame == 1) break;
 				if (r != 2) updateTable();
 			}
 
 			//showdown
+            Comparator cmp = new HandComparator();
+            Hand[] hands = new Hand[players_ingame];
+            Hand highest = null;
+            int winner = -1;
+            int h = 0;
+            for (int j=0; j<players.length; j++) {
+                if (players[i].isIngame()) {
+                    Card[] p_hole = players[i].getHole();
+                    HandAnalyzer ha = new HandAnalyzer(on_table, p_hole);
+                    Hand hand = ha.analyze();
+                    if (highest == null || cmp.compare(hand, highest)==1) {
+                        highest = hand;
+                        winner = i;
+                    }
+                }
+            }
+
+            Log.notify("winner: "+winner);
+            announceAction(winner, 6, pot);
+            players[winner].win(pot);
+
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {}
 
 			endRound();
 		}
@@ -211,6 +247,13 @@ public class ServerManager implements Runnable {
 	
 	private int requestAction(int i) {
 		sendTo(i, "RA");
+		return Integer.parseInt(recieveFrom(i));
+	}
+
+	private int requestRaise(int i, float hb, float bb) {
+		sendTo(i, "RR");
+        sendTo(i, Float.toString(hb)); // highest bet
+        sendTo(i, Float.toString(bb)); // big blind
 		return Integer.parseInt(recieveFrom(i));
 	}
 

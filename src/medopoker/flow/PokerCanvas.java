@@ -36,7 +36,9 @@ public class PokerCanvas  extends GameCanvas {
 	final int CARD_HEIGHT = 68;
 
 
-	public static String[] actions = {"FOLD", "CHECK", "CALL", "RAISE", "SB", "BB"};
+	public static String[] actions = {"FOLD", "CHECK", "CALL", "RAISE", "SB", "BB", "WINS"};
+    private String[] raises = {};
+    private String[] choices = actions;
 
 	/////////
 
@@ -98,7 +100,8 @@ public class PokerCanvas  extends GameCanvas {
 	public void newOnTable(Card[] cs) {
 		on_table = cs;
 		cards_shown = 3;
-		redraw();
+		paintCardsToTable(on_table, cards_shown);
+        flushGraphics(); // TODO
 	}
 
 	public void showMoreCards() {
@@ -108,8 +111,23 @@ public class PokerCanvas  extends GameCanvas {
 
 	public void getAction() {
 		choices_shown = true;
-		redraw();
+        choice = 0;
+        choices = actions;
+		paintChoices();
+        flushGraphics();
 	}
+
+    public void getRaise(float hb, float bb) {
+        choices_shown = true;
+        choice = 0;
+        raises = new String[5];
+        for (int i=0; i<5; i++) {
+            raises[i] = Float.toString(hb + (i+1)*bb);
+        }
+        choices = raises;
+        paintChoices();
+        flushGraphics();
+    }
 
 	public void currentAction(int a, int p) {
 		current_action = a;
@@ -167,6 +185,7 @@ public class PokerCanvas  extends GameCanvas {
 	private void paintMiddle() {
 		paintBG(CARD_HEIGHT, screen_height-CARD_HEIGHT);
 		g.setColor(255,255,255);
+		g.setFont(Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_BOLD, Font.SIZE_MEDIUM));
 		if (pot != null) g.drawString(pot, screen_width/2, screen_height/2+5, Graphics.BASELINE|Graphics.HCENTER);
 		for (int i=0; i<players.length; i++) {
 			paintPlayer(players[i], i);
@@ -260,7 +279,6 @@ public class PokerCanvas  extends GameCanvas {
 		try {
 			Log.notify("drawing bg...");
 			g.drawRegion(background, 0, from, screen_width, to-from, 0, 0, from, Graphics.TOP|Graphics.LEFT);
-			//g.drawRegion(background, 0, 0, 100, 100, 0, 0, 0, Graphics.TOP|Graphics.LEFT);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -280,7 +298,7 @@ public class PokerCanvas  extends GameCanvas {
 
 		g.setFont(Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_BOLD, Font.SIZE_LARGE));
 		Log.notify("got font");
-		g.drawString(actions[choice], width/2, screen_height-height/4, Graphics.BASELINE|Graphics.HCENTER);
+		g.drawString(choices[choice], width/2, screen_height-height/4, Graphics.BASELINE|Graphics.HCENTER);
 		Log.notify("drew string");
 		flushGraphics();
 	}
@@ -323,10 +341,10 @@ public class PokerCanvas  extends GameCanvas {
 			case 53:
 				choices_shown = false;
 				cm.sendAction(choice+"");
-				//paintBG(screen_height-CARD_HEIGHT, screen_height);
-				//paintHole();
-				//paintLog();
-				redraw();
+				paintBG(screen_height-CARD_HEIGHT, screen_height);
+				paintHole();
+				paintLog();
+				//redraw();
 				break;
 		}
 	}

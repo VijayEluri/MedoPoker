@@ -99,7 +99,7 @@ public class Card {
 
 		/*System.out.println("DECK");
 		for (int i=0; i<deck.length; i++) {
-			System.out.println(deck[i]);
+			//System.out.println(deck[i]);
 		}*/
 
 		return deck;

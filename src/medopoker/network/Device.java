@@ -91,6 +91,7 @@ public class Device {
 				Log.err(e.getMessage());
 			}
 		}
+        Log.notify("sent: "+msg);
 	}
 
 	public String getFriendlyName() {
