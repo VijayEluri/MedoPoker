@@ -57,6 +57,7 @@ public class PokerCanvas  extends GameCanvas {
 	private int current_player = -1;
 
 	private String pot = null;
+    private String highest_bet = null;
 	/////////
 
 
@@ -99,7 +100,7 @@ public class PokerCanvas  extends GameCanvas {
 
 	public void newOnTable(Card[] cs) {
 		on_table = cs;
-		cards_shown = 3;
+		cards_shown = 0;
 		paintCardsToTable(on_table, cards_shown);
         flushGraphics(); // TODO
 	}
@@ -135,8 +136,9 @@ public class PokerCanvas  extends GameCanvas {
 		paintMiddle();
 	}
 
-	public void updatePot(String f) {
+	public void updatePot(String f, String hb) {
 		pot = f;
+        highest_bet = hb;
 		paintMiddle();
 	}
 
@@ -185,8 +187,12 @@ public class PokerCanvas  extends GameCanvas {
 	private void paintMiddle() {
 		paintBG(CARD_HEIGHT, screen_height-CARD_HEIGHT);
 		g.setColor(255,255,255);
-		g.setFont(Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_BOLD, Font.SIZE_MEDIUM));
+        Font font_pot = Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_BOLD, Font.SIZE_MEDIUM);
+		g.setFont(font_pot);
 		if (pot != null) g.drawString(pot, screen_width/2, screen_height/2+5, Graphics.BASELINE|Graphics.HCENTER);
+        g.setFont(Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+        g.setColor(0,0,0);
+        if (highest_bet != null) g.drawString(highest_bet, screen_width/2, screen_height/2+10+font_pot.getHeight(), Graphics.BASELINE|Graphics.HCENTER);
 		for (int i=0; i<players.length; i++) {
 			paintPlayer(players[i], i);
 			Log.notify("drawing player"+players[i].getName());

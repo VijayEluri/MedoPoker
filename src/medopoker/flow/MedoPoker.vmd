@@ -28,9 +28,9 @@
                     <Property name="instanceName" typeID="Pjava.lang.String" value="Vlist"/>
                     <Property name="codeGenerated" typeID="Pboolean" value="Vtrue"/>
                     <Property name="commands" typeID="1C#CommandEventSource" value="A1:3_R21"/>
-                    <Property name="title" typeID="Pjava.lang.String" value="Vlist"/>
+                    <Property name="title" typeID="Pjava.lang.String" value="VMedoPoker"/>
                     <Property name="commandListener" typeID="C#CommandListener" value="R7"/>
-                    <Property name="elements" typeID="1C#ListElementEventSource" value="A3:3_R253_R263_R27"/>
+                    <Property name="elements" typeID="1C#ListElementEventSource" value="A4:3_R253_R263_R273_R33"/>
                     <Property name="selectCommand" typeID="C#CommandEventSource" value="R21"/>
                     <Component componentID="21" typeID="C#ListSelectCommandEventSource">
                         <Property name="eventHandler" typeID="C#EventHandler" value="R22"/>
@@ -50,13 +50,22 @@
                     <Component componentID="26" typeID="C#ListElementEventSource">
                         <Property name="string" typeID="Pjava.lang.String" value="VHost game"/>
                     </Component>
+                    <Component componentID="33" typeID="C#ListElementEventSource">
+                        <Property name="eventHandler" typeID="C#EventHandler" value="R34"/>
+                        <Property name="string" typeID="Pjava.lang.String" value="VExit"/>
+                        <Component componentID="34" typeID="C#ExitMidletEventHandler">
+                            <Property name="eventSource" typeID="C#EventSource" value="R33"/>
+                            <Property name="mobileDevice" typeID="C#MobileDevice" value="R2"/>
+                        </Component>
+                    </Component>
                 </Component>
                 <Component componentID="28" typeID="Corg.netbeans.microedition.lcdui.SplashScreen">
                     <Property name="instanceName" typeID="Pjava.lang.String" value="VsplashScreen"/>
                     <Property name="codeGenerated" typeID="Pboolean" value="Vtrue"/>
                     <Property name="commands" typeID="1C#CommandEventSource" value="A1:3_R29"/>
-                    <Property name="title" typeID="Pjava.lang.String" value="VsplashScreen"/>
+                    <Property name="title" typeID="Pjava.lang.String" value="VMedoSplash"/>
                     <Property name="commandListener" typeID="C#CommandListener" value="R7"/>
+                    <Property name="isFullScreen" typeID="Pboolean" value="Vtrue"/>
                     <Property name="image" typeID="Cjavax.microedition.lcdui.Image" value="R18"/>
                     <Component componentID="29" typeID="C#SplashScreenDismissCommandEventSource">
                         <Property name="eventHandler" typeID="C#EventHandler" value="R30"/>
@@ -82,6 +91,12 @@
                     <Property name="priority" typeID="Pint" value="V0"/>
                     <Property name="ordinary" typeID="Pboolean" value="Vfalse"/>
                 </Component>
+                <Component componentID="31" typeID="Cjavax.microedition.lcdui.Command">
+                    <Property name="instanceName" typeID="Pjava.lang.String" value="VexitCommand"/>
+                    <Property name="codeGenerated" typeID="Pboolean" value="Vtrue"/>
+                    <Property name="label" typeID="Pjava.lang.String" value="VExit"/>
+                    <Property name="type" typeID="Pint" value="V7"/>
+                </Component>
             </Component>
             <Component componentID="12" typeID="C#ResourcesCategory">
                 <Component componentID="18" typeID="Cjavax.microedition.lcdui.Image">
@@ -94,8 +109,8 @@
         </Component>
     </Document>
     <FlowScene version="1">
-        <Node componentID="19" descriptorID="componentNode19" x="534" y="202"/>
-        <Node componentID="28" descriptorID="componentNode28" x="348" y="63"/>
+        <Node componentID="28" descriptorID="componentNode28" x="211" y="128"/>
         <Node componentID="2" descriptorID="componentNode2" x="16" y="23"/>
+        <Node componentID="19" descriptorID="componentNode19" x="451" y="201"/>
     </FlowScene>
 </VisualDesign>

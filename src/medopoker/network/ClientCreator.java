@@ -12,6 +12,7 @@ import javax.microedition.io.*;
 
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.lcdui.*;
+import medopoker.flow.MedoPoker;
 import medopoker.log.Log;
 
 /**
@@ -23,11 +24,13 @@ public class ClientCreator implements CommandListener, Runnable {
 	private final Object servLock = new Object();
 	private final Object devLock = new Object();
 	private InquiryListener inqListener;
-	private ServiceListener servListener;
+    private DiscoveryAgent da;
 	private int devIndex = -1;
 	private Device d;
 	private Display disp;
 	private ClientParent cp;
+    private Command cancel;
+    private Thread t;
 
 	public ClientCreator(MIDlet m) {
 		disp = Display.getDisplay(m);
@@ -43,15 +46,18 @@ public class ClientCreator implements CommandListener, Runnable {
 
 		String msg = "Searching for devices...";
 		form.append(msg);
+        cancel = new Command("Cancel", Command.CANCEL, 1);
+        form.addCommand(cancel);
+        form.setCommandListener(this);
 
-		Thread t = new Thread(this);
+		t = new Thread(this);
 		t.start();
 	}
 
 	public void run() {
 		try {
 			LocalDevice ld = LocalDevice.getLocalDevice();
-			DiscoveryAgent da = ld.getDiscoveryAgent();
+			da = ld.getDiscoveryAgent();
 			ld.setDiscoverable(DiscoveryAgent.GIAC);
 
 			Log.notify("Starting device inquiry...");
@@ -63,23 +69,20 @@ public class ClientCreator implements CommandListener, Runnable {
 
 			if (inqListener.getDevicesFound().isEmpty()) {
 				Log.err("No devices found!");
-				System.exit(0);
+                Alert a = new Alert("No devices found!");
+                a.setString("No devices found!");
+                a.setTimeout(Alert.FOREVER);
+                disp.setCurrent(a, ((MedoPoker)cp).getList());
+				return;
 			}
 
 			displayDeviceList(inqListener.getDevicesFound());
-			synchronized (devLock) {
+			synchronized (devLock) { // give user time to select the device
 				try {devLock.wait();} catch(InterruptedException e){}
 			}
-			RemoteDevice remoteDevice = (RemoteDevice) inqListener.getDevicesFound().elementAt(devIndex);
 
-			servListener = new ServiceListener();
-			UUID[] uuids = {new UUID("01101101", true)};
-			synchronized(servLock) {
-				da.searchServices(null, uuids, remoteDevice, servListener);
-				try {servLock.wait();} catch(InterruptedException e){}
-			}
-
-			String url = servListener.getService().getConnectionURL(0, false);
+			String url = (String)inqListener.getDevURLsFound().elementAt(devIndex);
+            Log.notify("SERVICE URL: " + url);
 			d = new Device((StreamConnection)Connector.open(url));
 			
 			cp.startClient(d);
@@ -104,20 +107,53 @@ public class ClientCreator implements CommandListener, Runnable {
 			synchronized (devLock) {
 				devLock.notify();
 			}
-		}
+		} else if (c == cancel) {
+            t.interrupt();
+            disp.setCurrent(((MedoPoker)cp).getList());
+        }
 	}
 
 	private class InquiryListener implements DiscoveryListener {
+
+		ServiceRecord service;
+        
 		private Vector devsFound = new Vector();
+        private Vector devURLs = new Vector();
 
 		public Vector getDevicesFound() {
 			return devsFound;
 		}
+
+        public Vector getDevURLsFound() {
+            return devURLs;
+        }
 		
-		public void deviceDiscovered(RemoteDevice dev, DeviceClass ds) {
+		public void deviceDiscovered(RemoteDevice dev, DeviceClass ds){
 			Log.notify("Device discovered!");
-			if (!devsFound.contains(dev))
+
+			UUID[] uuids = {new UUID("01101101", true)};
+            service = null;
+			synchronized(servLock) {
+                try {
+                    da.searchServices(null, uuids, dev, this);
+                    servLock.wait();
+                } catch (BluetoothStateException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {}
+			}
+
+            if (service != null && !devsFound.contains(dev)) {
 				devsFound.addElement(dev);
+                devURLs.addElement(service.getConnectionURL(0, false));
+            }
+		}
+
+		public void servicesDiscovered(int id, ServiceRecord[] sr) {
+			service = sr[0];
+		}
+
+		public void serviceSearchCompleted(int arg0, int arg1) {
+			synchronized(servLock) {servLock.notify();}
 		}
 
 		public void inquiryCompleted(int arg0) {
@@ -127,28 +163,5 @@ public class ClientCreator implements CommandListener, Runnable {
 			}
 		}
 
-		public void serviceSearchCompleted(int arg0, int arg1) {}
-		public void servicesDiscovered(int arg0, ServiceRecord[] arg1) {}
-
-	}
-
-	private class ServiceListener implements DiscoveryListener {
-		ServiceRecord service;
-
-		public void deviceDiscovered(RemoteDevice arg0, DeviceClass arg1) {}
-		public void inquiryCompleted(int arg0) {}
-
-		public void serviceSearchCompleted(int arg0, int arg1) {
-			synchronized(servLock) {servLock.notify();}
-		}
-
-		public void servicesDiscovered(int id, ServiceRecord[] sr) {
-			service = sr[0];
-		}
-
-		public ServiceRecord getService() {
-			return service;
-		}
-
-	}
+    }
 }

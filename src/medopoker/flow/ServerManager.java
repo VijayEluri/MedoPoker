@@ -22,6 +22,7 @@ public class ServerManager implements Runnable {
 	private final float SB = 5.0f;
 
 	private float pot = 0.0f;
+    private float highest_bet = 0.0f;
 
 	private Vector deviceList;
 	private ServerPlayer[] players;
@@ -69,7 +70,7 @@ public class ServerManager implements Runnable {
 			startRound();
 
 			int i = dealer;
-			float highest_bet = 2*SB;
+			highest_bet = 2*SB;
             float per_player_in = 0;
 			// SB & BB
 			i = increment(i);
@@ -90,13 +91,15 @@ public class ServerManager implements Runnable {
 			playerUpdate();
 			updatePot();
 			
-			for(int r=0; r<3; r++) {
+			for(int r=0; r<4; r++) {
 
 				if (r != 0) {
                     i = increment(dealer);
                     highest_better = i;
                     highest_bet = 0;
                 }
+
+                updatePot();
 
                 boolean round_finished = false;
 
@@ -137,28 +140,34 @@ public class ServerManager implements Runnable {
 					}
 					playerUpdate();
 					updatePot();
-					i = increment(i);
 
-                    if (i==highest_better) round_finished = true;
-                    if (r==0 && i==big_blind && a == 3) {  // if the BB guy raises
-                        round_finished = false;
-                        big_blind = -1;
+                    if (increment(i) == highest_better) round_finished = true;
+                    if (r==0) {  // if the BB guy raises
+                        if (increment(i)==big_blind) {
+                            round_finished = false;
+                        }
+                        if (i==big_blind && a<3) {
+                            round_finished = true;
+                            big_blind = -1;
+                        }
                     }
 
-				//} while (!round_finished || (r==0&&i==big_blind)?true:false);
+					i = increment(i);
+                    if (players_ingame == 1) break;
+
                 } while (!round_finished);
+                Log.notify("XYZ");
 
                 per_player_in += highest_bet;
                 if (players_ingame == 1) break;
-				if (r != 2) updateTable();
+				if (r != 3) updateTable();
+                if (r == 0) {updateTable();updateTable();} // flop
 			}
 
 			//showdown
             Comparator cmp = new HandComparator();
-            Hand[] hands = new Hand[players_ingame];
             Hand highest = null;
             int winner = -1;
-            int h = 0;
             for (int j=0; j<players.length; j++) {
                 if (players[i].isIngame()) {
                     Card[] p_hole = players[i].getHole();
@@ -179,6 +188,7 @@ public class ServerManager implements Runnable {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {}
 
+            dealer = increment(dealer);
 			endRound();
 		}
 		broadcast("EXIT");
@@ -241,6 +251,7 @@ public class ServerManager implements Runnable {
 	private void updatePot() {
 		broadcast("UPOT");
 		broadcast(String.valueOf(pot));
+        broadcast(String.valueOf(highest_bet));
 	}
 
 	private void logUpdate(String s) {

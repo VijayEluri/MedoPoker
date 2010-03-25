@@ -24,6 +24,7 @@ public class MedoPoker extends MIDlet implements CommandListener, ServerParent, 
     //<editor-fold defaultstate="collapsed" desc=" Generated Fields ">//GEN-BEGIN:|fields|0|
     private List list;
     private SplashScreen splashScreen;
+    private Command exitCommand;
     private Image image1;
     //</editor-fold>//GEN-END:|fields|0|
 
@@ -145,12 +146,13 @@ public class MedoPoker extends MIDlet implements CommandListener, ServerParent, 
     public List getList() {
         if (list == null) {//GEN-END:|19-getter|0|19-preInit
 			// write pre-init user code here
-            list = new List("list", Choice.IMPLICIT);//GEN-BEGIN:|19-getter|1|19-postInit
+            list = new List("MedoPoker", Choice.IMPLICIT);//GEN-BEGIN:|19-getter|1|19-postInit
             list.append("Join game", null);
             list.append("Host game", null);
             list.append("About", null);
+            list.append("Exit", null);
             list.setCommandListener(this);
-            list.setSelectedFlags(new boolean[] { true, false, false });//GEN-END:|19-getter|1|19-postInit
+            list.setSelectedFlags(new boolean[] { true, false, false, false });//GEN-END:|19-getter|1|19-postInit
 			// write post-init user code here
         }//GEN-BEGIN:|19-getter|2|
         return list;
@@ -179,11 +181,15 @@ public class MedoPoker extends MIDlet implements CommandListener, ServerParent, 
 				// write pre-action user code here
 //GEN-LINE:|19-action|6|27-postAction
 				// write post-action user code here
-            }//GEN-BEGIN:|19-action|7|19-postAction
-        }//GEN-END:|19-action|7|19-postAction
+            } else if (__selectedString.equals("Exit")) {//GEN-LINE:|19-action|7|33-preAction
+                // write pre-action user code here
+                exitMIDlet();//GEN-LINE:|19-action|8|33-postAction
+                // write post-action user code here
+            }//GEN-BEGIN:|19-action|9|19-postAction
+        }//GEN-END:|19-action|9|19-postAction
 		// enter post-action user code here
-    }//GEN-BEGIN:|19-action|8|
-    //</editor-fold>//GEN-END:|19-action|8|
+    }//GEN-BEGIN:|19-action|10|
+    //</editor-fold>//GEN-END:|19-action|10|
 
     //<editor-fold defaultstate="collapsed" desc=" Generated Getter: splashScreen ">//GEN-BEGIN:|28-getter|0|28-preInit
     /**
@@ -194,14 +200,30 @@ public class MedoPoker extends MIDlet implements CommandListener, ServerParent, 
         if (splashScreen == null) {//GEN-END:|28-getter|0|28-preInit
 			// write pre-init user code here
             splashScreen = new SplashScreen(getDisplay());//GEN-BEGIN:|28-getter|1|28-postInit
-            splashScreen.setTitle("splashScreen");
+            splashScreen.setTitle("MedoSplash");
             splashScreen.setCommandListener(this);
+            splashScreen.setFullScreenMode(true);
             splashScreen.setImage(getImage1());//GEN-END:|28-getter|1|28-postInit
 			// write post-init user code here
         }//GEN-BEGIN:|28-getter|2|
         return splashScreen;
     }
     //</editor-fold>//GEN-END:|28-getter|2|
+
+    //<editor-fold defaultstate="collapsed" desc=" Generated Getter: exitCommand ">//GEN-BEGIN:|31-getter|0|31-preInit
+    /**
+     * Returns an initiliazed instance of exitCommand component.
+     * @return the initialized component instance
+     */
+    public Command getExitCommand() {
+        if (exitCommand == null) {//GEN-END:|31-getter|0|31-preInit
+            // write pre-init user code here
+            exitCommand = new Command("Exit", Command.EXIT, 0);//GEN-LINE:|31-getter|1|31-postInit
+            // write post-init user code here
+        }//GEN-BEGIN:|31-getter|2|
+        return exitCommand;
+    }
+    //</editor-fold>//GEN-END:|31-getter|2|
 
 
 

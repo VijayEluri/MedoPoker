@@ -12,6 +12,7 @@ import javax.microedition.io.*;
 import javax.microedition.lcdui.*;
 
 import javax.microedition.midlet.MIDlet;
+import medopoker.flow.MedoPoker;
 import medopoker.log.Log;
 
 /**
@@ -25,7 +26,9 @@ public class ServerCreator implements Runnable, CommandListener {
 	private List list;
 	private Command start;
 	private Command kick;
+    private Command back;
 	private ServerParent sp;
+    private Thread t;
 
 	public ServerCreator(MIDlet m) {
 		accepting = true;
@@ -40,13 +43,15 @@ public class ServerCreator implements Runnable, CommandListener {
 	}
 
 	public void startAccepting() {
-		Thread t = new Thread(this);
+		t = new Thread(this);
 		t.start();
 		list = new List("Waiting for devices", List.IMPLICIT);
 		start = new Command("Start", Command.OK, 1);
 		kick = new Command("Kick selected", Command.CANCEL, 1);
+        back = new Command("Back", Command.STOP, 1);
 		list.addCommand(start);
 		list.addCommand(kick);
+        list.addCommand(back);
 		list.setCommandListener(this);
 		disp.setCurrent(list);
 	}
@@ -59,7 +64,10 @@ public class ServerCreator implements Runnable, CommandListener {
 			int index = list.getSelectedIndex();
 			deviceList.removeElementAt(index);
 			list.delete(index);
-		}
+		} else if (c == back) {
+            t.interrupt();
+            disp.setCurrent(((MedoPoker)sp).getList());
+        }
 	}
 
 	public void run() {

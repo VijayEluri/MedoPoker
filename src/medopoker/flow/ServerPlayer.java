@@ -47,6 +47,7 @@ public class ServerPlayer extends Player {
 
 	public void reset_round() {
 		money_in = 0;
+        setIngame(true);
 	}
 
 	public void execAction(int a) {

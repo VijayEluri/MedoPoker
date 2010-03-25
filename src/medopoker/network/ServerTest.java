@@ -23,6 +23,5 @@ public class ServerTest extends MIDlet implements ServerParent {
     }
 
 	public void startServer(Vector dl) {
-		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }

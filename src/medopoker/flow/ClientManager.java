@@ -114,7 +114,7 @@ public class ClientManager implements Runnable {
 
 	private void recieveUPOT() {
 		msg = d.recieve();
-		PCanvas.updatePot(msg);
+		PCanvas.updatePot(msg, d.recieve());
 	}
 
 	private void recieveLU() {
