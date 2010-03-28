@@ -26,7 +26,7 @@ public class Device {
 	private InputStream is;
 	private OutputStream os;
 	private String name;
-
+    
 	public Device(String localName) {
 		conn = null;
 		local = true;
@@ -38,6 +38,7 @@ public class Device {
 	}
 	
 	public Device(StreamConnection connection) {
+        
 		local = false;
 		localDevice = null;
 		conn = connection;
@@ -52,6 +53,7 @@ public class Device {
 	}
 
 	public String recieve() {
+
 		if (local) {
 			while(localMsgQueue.isEmpty()) {}
 			String s = (String)localMsgQueue.firstElement();
@@ -87,6 +89,7 @@ public class Device {
 			try {
 				os.write(msg.length());
 				os.write(msg.getBytes());
+                os.flush();
 			} catch (IOException e) {
 				Log.err(e.getMessage());
 			}

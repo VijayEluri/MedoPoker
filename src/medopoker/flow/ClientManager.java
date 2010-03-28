@@ -27,10 +27,10 @@ public class ClientManager implements Runnable {
 	private Card[] hole;
 	private Card[] on_table;
 
-	public ClientManager(Device dev, MIDlet m) {
+	public ClientManager(Device dev, MIDlet m, boolean graphics) {
 		d = dev;
 		disp = Display.getDisplay(m);
-		PCanvas = new PokerCanvas(this);
+		PCanvas = new PokerCanvas(this, graphics);
 		Thread t = new Thread(this);
 		t.start();
 		Log.notify("CM running");

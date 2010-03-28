@@ -18,8 +18,8 @@ import medopoker.network.Device;
  */
 public class ServerManager implements Runnable {
 
-	private final float STARTING_MONEY = 200.0f;
-	private final float SB = 5.0f;
+	private float STARTING_MONEY;
+	private float SB;
 
 	private float pot = 0.0f;
     private float highest_bet = 0.0f;
@@ -33,8 +33,10 @@ public class ServerManager implements Runnable {
 
 	private String[] actions = {"FOLD", "CHECK", "CALL", "RAISE", "SB", "BB"};
 
-	public ServerManager(Vector dl) {
+	public ServerManager(Vector dl, float sm, float sb) {
 		deviceList = dl;
+        STARTING_MONEY = sm;
+        SB = sb;
 	}
 
 	public void startGame() {
@@ -49,7 +51,6 @@ public class ServerManager implements Runnable {
 
 
 	public void run() {
-
 		broadcast("START");
 		playerInit();
 

@@ -31,7 +31,6 @@ public class ClientCreator implements CommandListener, Runnable {
 	private ClientParent cp;
     private Command cancel;
     private Thread t;
-
 	public ClientCreator(MIDlet m) {
 		disp = Display.getDisplay(m);
 		cp = (ClientParent)m;

@@ -12,7 +12,9 @@ import javax.microedition.lcdui.*;
 import medopoker.network.*;
 import org.netbeans.microedition.lcdui.SplashScreen;
 import javax.bluetooth.LocalDevice;
+import javax.microedition.rms.RecordStoreException;
 import medopoker.log.Log;
+import medopoker.testui.MIDPLogger;
 
 /**
  * @author Martin
@@ -20,11 +22,20 @@ import medopoker.log.Log;
 public class MedoPoker extends MIDlet implements CommandListener, ServerParent, ClientParent {
 
     private boolean midletPaused = false;
+    private float STARTING_MONEY = 200.0f;
+    private float SB = 5.0f;
+    private boolean BETTER_GRAPHICS = true;
+    private MIDPLogger logger;
 
     //<editor-fold defaultstate="collapsed" desc=" Generated Fields ">//GEN-BEGIN:|fields|0|
     private List list;
     private SplashScreen splashScreen;
+    private Form form;
+    private TextField textField;
+    private TextField textField1;
+    private ChoiceGroup choiceGroup;
     private Command exitCommand;
+    private Command okCommand;
     private Image image1;
     //</editor-fold>//GEN-END:|fields|0|
 
@@ -32,6 +43,12 @@ public class MedoPoker extends MIDlet implements CommandListener, ServerParent, 
      * The MedoPoker constructor.
      */
     public MedoPoker() {
+        try {
+            logger = new MIDPLogger(0, true, false);
+        } catch (RecordStoreException ex) {
+            ex.printStackTrace();
+        }
+        logger.write("MP init", 0);
     }
 
     //<editor-fold defaultstate="collapsed" desc=" Generated Methods ">//GEN-BEGIN:|methods|0|
@@ -97,22 +114,35 @@ public class MedoPoker extends MIDlet implements CommandListener, ServerParent, 
      */
     public void commandAction(Command command, Displayable displayable) {//GEN-END:|7-commandAction|0|7-preCommandAction
 		// write pre-action user code here
-        if (displayable == list) {//GEN-BEGIN:|7-commandAction|1|21-preAction
-            if (command == List.SELECT_COMMAND) {//GEN-END:|7-commandAction|1|21-preAction
+        if (displayable == form) {//GEN-BEGIN:|7-commandAction|1|41-preAction
+            if (command == okCommand) {//GEN-END:|7-commandAction|1|41-preAction
+                try {
+                    STARTING_MONEY = Float.parseFloat(textField.getString());
+                    SB = Float.parseFloat(textField1.getString());
+                    BETTER_GRAPHICS = choiceGroup.isSelected(0);
+                } catch (Exception e) {
+                    STARTING_MONEY = 200.0f;
+                    SB = 5.0f;
+                }
+                switchDisplayable(null, getList());//GEN-LINE:|7-commandAction|2|41-postAction
+                // write post-action user code here
+            }//GEN-BEGIN:|7-commandAction|3|21-preAction
+        } else if (displayable == list) {
+            if (command == List.SELECT_COMMAND) {//GEN-END:|7-commandAction|3|21-preAction
 				// write pre-action user code here
-                listAction();//GEN-LINE:|7-commandAction|2|21-postAction
+                listAction();//GEN-LINE:|7-commandAction|4|21-postAction
 				// write post-action user code here
-            }//GEN-BEGIN:|7-commandAction|3|29-preAction
+            }//GEN-BEGIN:|7-commandAction|5|29-preAction
         } else if (displayable == splashScreen) {
-            if (command == SplashScreen.DISMISS_COMMAND) {//GEN-END:|7-commandAction|3|29-preAction
+            if (command == SplashScreen.DISMISS_COMMAND) {//GEN-END:|7-commandAction|5|29-preAction
 				// write pre-action user code here
-                switchDisplayable(null, getList());//GEN-LINE:|7-commandAction|4|29-postAction
+                switchDisplayable(null, getList());//GEN-LINE:|7-commandAction|6|29-postAction
 				// write post-action user code here
-            }//GEN-BEGIN:|7-commandAction|5|7-postCommandAction
-        }//GEN-END:|7-commandAction|5|7-postCommandAction
+            }//GEN-BEGIN:|7-commandAction|7|7-postCommandAction
+        }//GEN-END:|7-commandAction|7|7-postCommandAction
 		// write post-action user code here
-    }//GEN-BEGIN:|7-commandAction|6|
-    //</editor-fold>//GEN-END:|7-commandAction|6|
+    }//GEN-BEGIN:|7-commandAction|8|
+    //</editor-fold>//GEN-END:|7-commandAction|8|
 
 
 
@@ -149,10 +179,11 @@ public class MedoPoker extends MIDlet implements CommandListener, ServerParent, 
             list = new List("MedoPoker", Choice.IMPLICIT);//GEN-BEGIN:|19-getter|1|19-postInit
             list.append("Join game", null);
             list.append("Host game", null);
+            list.append("Settings", null);
             list.append("About", null);
             list.append("Exit", null);
             list.setCommandListener(this);
-            list.setSelectedFlags(new boolean[] { true, false, false, false });//GEN-END:|19-getter|1|19-postInit
+            list.setSelectedFlags(new boolean[] { true, false, false, false, false });//GEN-END:|19-getter|1|19-postInit
 			// write post-init user code here
         }//GEN-BEGIN:|19-getter|2|
         return list;
@@ -177,19 +208,23 @@ public class MedoPoker extends MIDlet implements CommandListener, ServerParent, 
 				ServerCreator sr = new ServerCreator(this);
 //GEN-LINE:|19-action|4|26-postAction
 				// write post-action user code here
-            } else if (__selectedString.equals("About")) {//GEN-LINE:|19-action|5|27-preAction
-				// write pre-action user code here
-//GEN-LINE:|19-action|6|27-postAction
-				// write post-action user code here
-            } else if (__selectedString.equals("Exit")) {//GEN-LINE:|19-action|7|33-preAction
+            } else if (__selectedString.equals("Settings")) {//GEN-LINE:|19-action|5|42-preAction
                 // write pre-action user code here
-                exitMIDlet();//GEN-LINE:|19-action|8|33-postAction
+                switchDisplayable(null, getForm());//GEN-LINE:|19-action|6|42-postAction
                 // write post-action user code here
-            }//GEN-BEGIN:|19-action|9|19-postAction
-        }//GEN-END:|19-action|9|19-postAction
+            } else if (__selectedString.equals("About")) {//GEN-LINE:|19-action|7|27-preAction
+				// write pre-action user code here
+//GEN-LINE:|19-action|8|27-postAction
+				// write post-action user code here
+            } else if (__selectedString.equals("Exit")) {//GEN-LINE:|19-action|9|33-preAction
+                // write pre-action user code here
+                exitMIDlet();//GEN-LINE:|19-action|10|33-postAction
+                // write post-action user code here
+            }//GEN-BEGIN:|19-action|11|19-postAction
+        }//GEN-END:|19-action|11|19-postAction
 		// enter post-action user code here
-    }//GEN-BEGIN:|19-action|10|
-    //</editor-fold>//GEN-END:|19-action|10|
+    }//GEN-BEGIN:|19-action|12|
+    //</editor-fold>//GEN-END:|19-action|12|
 
     //<editor-fold defaultstate="collapsed" desc=" Generated Getter: splashScreen ">//GEN-BEGIN:|28-getter|0|28-preInit
     /**
@@ -224,6 +259,85 @@ public class MedoPoker extends MIDlet implements CommandListener, ServerParent, 
         return exitCommand;
     }
     //</editor-fold>//GEN-END:|31-getter|2|
+
+    //<editor-fold defaultstate="collapsed" desc=" Generated Getter: form ">//GEN-BEGIN:|35-getter|0|35-preInit
+    /**
+     * Returns an initiliazed instance of form component.
+     * @return the initialized component instance
+     */
+    public Form getForm() {
+        if (form == null) {//GEN-END:|35-getter|0|35-preInit
+            // write pre-init user code here
+            form = new Form("Settings", new Item[] { getTextField(), getTextField1(), getChoiceGroup() });//GEN-BEGIN:|35-getter|1|35-postInit
+            form.addCommand(getOkCommand());
+            form.setCommandListener(this);//GEN-END:|35-getter|1|35-postInit
+            // write post-init user code here
+        }//GEN-BEGIN:|35-getter|2|
+        return form;
+    }
+    //</editor-fold>//GEN-END:|35-getter|2|
+
+    //<editor-fold defaultstate="collapsed" desc=" Generated Getter: textField ">//GEN-BEGIN:|38-getter|0|38-preInit
+    /**
+     * Returns an initiliazed instance of textField component.
+     * @return the initialized component instance
+     */
+    public TextField getTextField() {
+        if (textField == null) {//GEN-END:|38-getter|0|38-preInit
+            // write pre-init user code here
+            textField = new TextField("Starting money", "200.0", 32, TextField.ANY);//GEN-LINE:|38-getter|1|38-postInit
+            // write post-init user code here
+        }//GEN-BEGIN:|38-getter|2|
+        return textField;
+    }
+    //</editor-fold>//GEN-END:|38-getter|2|
+
+    //<editor-fold defaultstate="collapsed" desc=" Generated Getter: textField1 ">//GEN-BEGIN:|39-getter|0|39-preInit
+    /**
+     * Returns an initiliazed instance of textField1 component.
+     * @return the initialized component instance
+     */
+    public TextField getTextField1() {
+        if (textField1 == null) {//GEN-END:|39-getter|0|39-preInit
+            // write pre-init user code here
+            textField1 = new TextField("Small Blind", "5.0", 32, TextField.ANY);//GEN-LINE:|39-getter|1|39-postInit
+            // write post-init user code here
+        }//GEN-BEGIN:|39-getter|2|
+        return textField1;
+    }
+    //</editor-fold>//GEN-END:|39-getter|2|
+
+    //<editor-fold defaultstate="collapsed" desc=" Generated Getter: okCommand ">//GEN-BEGIN:|40-getter|0|40-preInit
+    /**
+     * Returns an initiliazed instance of okCommand component.
+     * @return the initialized component instance
+     */
+    public Command getOkCommand() {
+        if (okCommand == null) {//GEN-END:|40-getter|0|40-preInit
+            // write pre-init user code here
+            okCommand = new Command("Ok", Command.OK, 0);//GEN-LINE:|40-getter|1|40-postInit
+            // write post-init user code here
+        }//GEN-BEGIN:|40-getter|2|
+        return okCommand;
+    }
+    //</editor-fold>//GEN-END:|40-getter|2|
+
+    //<editor-fold defaultstate="collapsed" desc=" Generated Getter: choiceGroup ">//GEN-BEGIN:|45-getter|0|45-preInit
+    /**
+     * Returns an initiliazed instance of choiceGroup component.
+     * @return the initialized component instance
+     */
+    public ChoiceGroup getChoiceGroup() {
+        if (choiceGroup == null) {//GEN-END:|45-getter|0|45-preInit
+            // write pre-init user code here
+            choiceGroup = new ChoiceGroup("Graphics", Choice.MULTIPLE);//GEN-BEGIN:|45-getter|1|45-postInit
+            choiceGroup.append("High-res", null);
+            choiceGroup.setSelectedFlags(new boolean[] { true });//GEN-END:|45-getter|1|45-postInit
+            // write post-init user code here
+        }//GEN-BEGIN:|45-getter|2|
+        return choiceGroup;
+    }
+    //</editor-fold>//GEN-END:|45-getter|2|
 
 
 
@@ -276,11 +390,11 @@ public class MedoPoker extends MIDlet implements CommandListener, ServerParent, 
 
 	public void startClient(Device d) {
 		Log.notify("Starting CM");
-		ClientManager cm = new ClientManager(d, this);
+		ClientManager cm = new ClientManager(d, this, BETTER_GRAPHICS);
 	}
 
 	public void startServer(Vector dl) {
-		ServerManager sm = new ServerManager(dl);
+		ServerManager sm = new ServerManager(dl, STARTING_MONEY, SB);
 		String localName = "Host";
 		try {
 			localName = LocalDevice.getLocalDevice().getFriendlyName();

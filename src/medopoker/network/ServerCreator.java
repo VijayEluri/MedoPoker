@@ -47,8 +47,8 @@ public class ServerCreator implements Runnable, CommandListener {
 		t.start();
 		list = new List("Waiting for devices", List.IMPLICIT);
 		start = new Command("Start", Command.OK, 1);
-		kick = new Command("Kick selected", Command.CANCEL, 1);
-        back = new Command("Back", Command.STOP, 1);
+        back = new Command("Back", Command.CANCEL, 1);
+		kick = new Command("Kick selected", Command.STOP, 1);
 		list.addCommand(start);
 		list.addCommand(kick);
         list.addCommand(back);

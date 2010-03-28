@@ -20,6 +20,7 @@ import medopoker.flow.Player;
  */
 public class PokerCanvas  extends GameCanvas implements Runnable {
 
+    Log logger;
 	private String img_path = "/resources/";
 	private Image[][] card_imgs;
 	private Image table_img;
@@ -40,7 +41,10 @@ public class PokerCanvas  extends GameCanvas implements Runnable {
 
 	public PokerCanvas () {
 		super(true);
-		Log.notify("PokerCanvas constructor");
+
+        logger = new Log();
+		logger.notify("PokerCanvas constructor");
+        
 		g = getGraphics();
 
 		screen_width = this.getWidth();
@@ -69,7 +73,7 @@ public class PokerCanvas  extends GameCanvas implements Runnable {
 	}
 
 	private void paintEverything() {
-		Log.notify("PokerCanvas paintEverything()");
+		logger.notify("PokerCanvas paintEverything()");
 		paintBG();
 		paintHole(hole);
 		paintCardsToTable(on_table);
@@ -95,7 +99,7 @@ public class PokerCanvas  extends GameCanvas implements Runnable {
 		for (int i=0; i<c.length; i++) {
 			if (c[i]==null) break;
 			Image img = card_imgs[c[i].getSuit()][c[i].getRank()];
-			Log.notify("drawing card");
+			logger.notify("drawing card");
 			g.drawImage(img, img.getWidth()/3*i*2, 0, Graphics.TOP|Graphics.LEFT);
 			//g.drawImage(img, screen_width/5*i, 0, Graphics.TOP|Graphics.LEFT);
 		}
@@ -143,7 +147,7 @@ public class PokerCanvas  extends GameCanvas implements Runnable {
 		g.setFont(f);
 
 		int line = height/f.getHeight();
-		Log.notify("HEIGHT: "+line);
+		logger.notify("HEIGHT: "+line);
 		LogElement e = log.getFirst();
 		do {
 			g.drawString(e.value(), x_offset+2, y_offset+5+(line*f.getHeight()), Graphics.BOTTOM|Graphics.LEFT);
@@ -152,7 +156,7 @@ public class PokerCanvas  extends GameCanvas implements Runnable {
 	}
 
 	public void paintBG() {
-		Log.notify("PokerCanvas paintBG()");
+		logger.notify("PokerCanvas paintBG()");
 		int img_width = bg.getWidth();
 		int img_height = bg.getHeight();
 		int x = 0;
@@ -188,9 +192,9 @@ public class PokerCanvas  extends GameCanvas implements Runnable {
 		drawArrow(width-5, y_offset+CARD_HEIGHT/4, false);
 
 		g.setFont(Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_BOLD, Font.SIZE_LARGE));
-		Log.notify("got font");
+		logger.notify("got font");
 		g.drawString("CALL", width/2, screen_height-height/4, Graphics.BASELINE|Graphics.HCENTER);
-		Log.notify("drew string");
+		logger.notify("drew string");
 	}
 	
 	public void drawArrow(int x, int y, boolean left) {
@@ -204,7 +208,7 @@ public class PokerCanvas  extends GameCanvas implements Runnable {
 	}
 
 	protected void showNotify() {
-		Log.notify("showNotify()");
+		logger.notify("showNotify()");
 		paintEverything();
 		thread = new Thread(this);
 		thread.start();
@@ -223,7 +227,7 @@ public class PokerCanvas  extends GameCanvas implements Runnable {
 	}
 
 	public void run() {
-		Log.notify("Run()");
+		logger.notify("Run()");
 		
 		try {
 			Thread.sleep(1000);
