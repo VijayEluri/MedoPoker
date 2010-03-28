@@ -1,6 +1,8 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *
+ * Copyright 2010 Nejc Saje
+ * nejc.saje@gmail.com
+ *
  */
 
 package medopoker.flow;
@@ -14,7 +16,7 @@ import medopoker.network.Device;
 
 /**
  *
- * @author Martin
+ * @author Nejc Saje
  */
 public class ServerManager implements Runnable {
 

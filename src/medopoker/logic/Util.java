@@ -1,13 +1,15 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *
+ * Copyright 2010 Nejc Saje
+ * nejc.saje@gmail.com
+ *
  */
 
 package medopoker.logic;
 
 /**
  *
- * @author Nejc
+ * @author Nejc Saje
  */
 public class Util {
 

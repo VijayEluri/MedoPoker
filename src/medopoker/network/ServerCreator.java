@@ -1,6 +1,8 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *
+ * Copyright 2010 Nejc Saje
+ * nejc.saje@gmail.com
+ *
  */
 
 package medopoker.network;
@@ -17,7 +19,7 @@ import medopoker.log.Log;
 
 /**
  *
- * @author Nejc
+ * @author Nejc Saje
  */
 public class ServerCreator implements Runnable, CommandListener {
 	private boolean accepting;

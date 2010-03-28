@@ -1,10 +1,17 @@
+/*
+ *
+ * Copyright 2010 Nejc Saje
+ * nejc.saje@gmail.com
+ *
+ */
+
 package medopoker.flow;
 
 import medopoker.logic.Card;
 
 /**
  *
- * @author Nejc
+ * @author Nejc Saje
  */
 public class ServerPlayer extends Player {
 

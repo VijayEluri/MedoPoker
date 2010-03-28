@@ -1,6 +1,8 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *
+ * Copyright 2010 Nejc Saje
+ * nejc.saje@gmail.com
+ *
  */
 
 package medopoker.network;
@@ -10,7 +12,7 @@ import javax.microedition.rms.RecordStoreException;
 import medopoker.testui.MIDPLogger;
 
 /**
- * @author Martin
+ * @author Nejc Saje
  */
 public class ClientTest extends MIDlet implements ClientParent {
     MIDPLogger logger;

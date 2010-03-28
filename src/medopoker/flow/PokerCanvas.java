@@ -1,22 +1,23 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *
+ * Copyright 2010 Nejc Saje
+ * nejc.saje@gmail.com
+ *
  */
+
 package medopoker.flow;
 
 import java.io.IOException;
 import javax.microedition.lcdui.*;
 import javax.microedition.lcdui.game.GameCanvas;
-import javax.microedition.rms.RecordStoreException;
 import medopoker.log.Log;
 import medopoker.logic.Card;
 import medopoker.logic.Util.LogList;
 import medopoker.logic.Util.LogList.LogElement;
-import medopoker.testui.MIDPLogger;
 
 /**
  *
- * @author Nejc
+ * @author Nejc Saje
  */
 public class PokerCanvas extends GameCanvas {
 
@@ -102,7 +103,7 @@ public class PokerCanvas extends GameCanvas {
         on_table = cs;
         cards_shown = 0;
         paintCardsToTable(on_table, cards_shown);
-        flushGraphics(); // TODO
+        flushGraphics();
     }
 
     public void showMoreCards() {

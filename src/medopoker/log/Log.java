@@ -1,37 +1,27 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *
+ * Copyright 2010 Nejc Saje
+ * nejc.saje@gmail.com
+ *
  */
 
 package medopoker.log;
 
-import medopoker.testui.MIDPLogger;
-
-
 
 /**
  *
- * @author Nejc
+ * @author Nejc Saje
  */
 public class Log {
-    MIDPLogger ml;
-
-    public Log() {
-        //try {
-        //    ml = new MIDPLogger(0, true, false);
-        //} catch (Exception e) {}
-    }
 
 	public static final boolean DEBUG = true;
 	
 	public static void err(String msg) {
 		if (DEBUG) System.out.println(msg);
-        //ml.write(msg, 3);
 	}
 
 	public static void notify(String msg) {
 		if (DEBUG) System.out.println(msg);
-        //ml.write(msg, 0);
 	}
 
 }

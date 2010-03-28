@@ -1,6 +1,8 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *
+ * Copyright 2010 Nejc Saje
+ * nejc.saje@gmail.com
+ *
  */
 
 package medopoker.flow;
@@ -17,7 +19,7 @@ import medopoker.log.Log;
 import medopoker.testui.MIDPLogger;
 
 /**
- * @author Martin
+ * @author Nejc Saje
  */
 public class MedoPoker extends MIDlet implements CommandListener, ServerParent, ClientParent {
 

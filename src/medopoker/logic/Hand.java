@@ -1,6 +1,8 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *
+ * Copyright 2010 Nejc Saje
+ * nejc.saje@gmail.com
+ *
  */
 
 package medopoker.logic;
@@ -9,7 +11,7 @@ import medopoker.logic.Util.*;
 
 /**
  *
- * @author Nejc
+ * @author Nejc Saje
  */
 public class Hand {
 	public static final String[] HANDS = {"High card", "Pair", "Two Pairs", "Three of a kind", "Straight", "Flush", "Full House", "Four of a kind", "Straight Flush" };

@@ -1,3 +1,10 @@
+/*
+ *
+ * Copyright 2010 Nejc Saje
+ * nejc.saje@gmail.com
+ *
+ */
+
 package medopoker.flow;
 
 import medopoker.logic.Card;
@@ -5,7 +12,7 @@ import medopoker.network.Device;
 
 /**
  *
- * @author Nejc
+ * @author Nejc Saje
  */
 public class Player {
 	private Device device;
