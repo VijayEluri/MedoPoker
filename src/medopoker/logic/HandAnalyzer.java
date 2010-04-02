@@ -18,6 +18,7 @@ import medopoker.logic.Util.Comparator;
 public class HandAnalyzer {
 	Hand highest;
 	Hand highest_pair=null;
+    Hand highest_TOAK=null;
 	Card[] cards;
 
 	public HandAnalyzer(Card[] on_table, Card[] hole) {
@@ -57,16 +58,15 @@ public class HandAnalyzer {
 						}
 					sub = Util.subList(cards, i, i+3);
 					current = new Hand(3, sub, cards);
-					checkFullHouse(current);
-					possibleHand(current);
+                    newThreeOAK(current);
 					i += 2;
 					continue;
 				}
 				sub = Util.subList(cards, i, i+2);
 				current = new Hand(1, sub, cards);
 				newPair(current);
-				possibleHand(current);
 				i += 1;
+                //TODO: checkFullHouse()
 			}
 		}
 		
@@ -119,17 +119,35 @@ public class HandAnalyzer {
 	private void newPair(Hand hand) {
 		if (highest_pair == null) {
 			highest_pair = hand;
+            possibleHand(hand);
+            checkFullHouse();
 		} else {
-			possibleHand(new Hand(2, Util.concat(hand.getCards(), highest_pair.getCards()), cards));
+			possibleHand(new Hand(2, Util.concat(hand.getCards(), highest_pair.getCards()), cards)); // two pairs
 			if ((new HandComparator()).compare(hand, highest_pair) == 1) {
 				highest_pair = hand;
+                possibleHand(hand);
+                checkFullHouse();
 			}
 		}
 	}
 
-	private void checkFullHouse(Hand hand) {
-		if (highest_pair != null) {
-			possibleHand(new Hand(6, Util.concat(hand.getCards(), highest_pair.getCards()), cards));
+    private void newThreeOAK(Hand hand) {
+        if (highest_TOAK == null) {
+            highest_TOAK = hand;
+            possibleHand(hand);
+            checkFullHouse();
+        } else {
+			if ((new HandComparator()).compare(hand, highest_TOAK) == 1) {
+				highest_TOAK = hand;
+                possibleHand(hand);
+                checkFullHouse();
+			}
+        }
+    }
+
+	private void checkFullHouse() {
+		if (highest_pair != null && highest_TOAK != null) {
+			possibleHand(new Hand(6, Util.concat(highest_TOAK.getCards(), highest_pair.getCards()), cards));
 		}
 	}
 

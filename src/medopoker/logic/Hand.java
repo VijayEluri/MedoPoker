@@ -28,11 +28,15 @@ public class Hand {
 	}
 
 	private Card[] pickComplement(Card[] c, Card[] t) {
-		Card[] r = Util.removeCards(t, c);
-		int start = r.length-c.length-1;
-		if (start < 0) start = 0;
+		if (hand_type == 5) {
+            return t;
+        } else {
+            Card[] r = Util.removeCards(t, c);
+            int start = r.length-c.length-1;
+            if (start < 0) start = 0;
 
-		return Util.subList(r, start, r.length);
+            return Util.subList(r, start, r.length);
+        }
 	}
 
 	public int getRank() {

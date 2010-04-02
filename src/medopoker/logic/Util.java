@@ -124,10 +124,16 @@ public class Util {
 			Hand h2 = (Hand)o2;
 
 			if (h1.getRank() == h2.getRank()) {
-				if (h1.getHighest().getRank() == h2.getHighest().getRank()) {
+				if (h1.getHighest().getRank() == h2.getHighest().getRank()) { //TODO compare individual cards for flush
 					Card[] c1 = h1.getComplement();
 					Card[] c2 = h2.getComplement();
-					for (int i=0; i<c1.length; i++) {
+					/*for (int i=0; i<c1.length; i++) {
+						if (c1[i].getRank() < c2[i].getRank())
+							return -1;
+						else if (c1[i].getRank() > c2[i].getRank())
+							return 1;
+					}*/
+                    for (int i=c1.length-1; i>=0; i--) {
 						if (c1[i].getRank() < c2[i].getRank())
 							return -1;
 						else if (c1[i].getRank() > c2[i].getRank())

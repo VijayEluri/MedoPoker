@@ -235,10 +235,11 @@ public class PokerCanvas extends GameCanvas {
     }
 
     private void paintPlayerAction(int action, int i) {
+        int offset = BETTER_GRAPHICS ? 40 : 25;
         int board_height = screen_height - 2 * CARD_HEIGHT;
         int[] anchors = new int[]{4 | 16, 8 | 16, 8 | 32, 4 | 32};
-        int x = (i > 0 && i < 3) ? screen_width - 25 : 25;
-        int y = (i < 2) ? CARD_HEIGHT + 25 : CARD_HEIGHT + board_height - 25;
+        int x = (i > 0 && i < 3) ? screen_width - offset : offset;
+        int y = (i < 2) ? CARD_HEIGHT + offset : CARD_HEIGHT + board_height - offset;
 
         g.setFont(Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_BOLD, Font.SIZE_MEDIUM));
         //g.setColor(2,32,0);

@@ -14,20 +14,17 @@ import javax.microedition.lcdui.*;
 import medopoker.network.*;
 import org.netbeans.microedition.lcdui.SplashScreen;
 import javax.bluetooth.LocalDevice;
-import javax.microedition.rms.RecordStoreException;
 import medopoker.log.Log;
-import medopoker.testui.MIDPLogger;
 
 /**
  * @author Nejc Saje
  */
 public class MedoPoker extends MIDlet implements CommandListener, ServerParent, ClientParent {
 
-    private boolean midletPaused = false;
-    private float STARTING_MONEY = 200.0f;
-    private float SB = 5.0f;
-    private boolean BETTER_GRAPHICS = true;
-    private MIDPLogger logger;
+    private boolean midletPaused;
+    private float STARTING_MONEY;
+    private float SB;
+    private boolean BETTER_GRAPHICS;
 
     //<editor-fold defaultstate="collapsed" desc=" Generated Fields ">//GEN-BEGIN:|fields|0|
     private List list;
@@ -36,6 +33,7 @@ public class MedoPoker extends MIDlet implements CommandListener, ServerParent, 
     private TextField textField;
     private TextField textField1;
     private ChoiceGroup choiceGroup;
+    private Alert alert;
     private Command exitCommand;
     private Command okCommand;
     private Image image1;
@@ -45,12 +43,10 @@ public class MedoPoker extends MIDlet implements CommandListener, ServerParent, 
      * The MedoPoker constructor.
      */
     public MedoPoker() {
-        try {
-            logger = new MIDPLogger(0, true, false);
-        } catch (RecordStoreException ex) {
-            ex.printStackTrace();
-        }
-        logger.write("MP init", 0);
+        midletPaused = false;
+        STARTING_MONEY = 200.0f;
+        SB = 5.0f;
+        BETTER_GRAPHICS = true; 
     }
 
     //<editor-fold defaultstate="collapsed" desc=" Generated Methods ">//GEN-BEGIN:|methods|0|
@@ -151,6 +147,7 @@ public class MedoPoker extends MIDlet implements CommandListener, ServerParent, 
 
 
 
+
     //<editor-fold defaultstate="collapsed" desc=" Generated Getter: image1 ">//GEN-BEGIN:|18-getter|0|18-preInit
     /**
      * Returns an initiliazed instance of image1 component.
@@ -216,7 +213,7 @@ public class MedoPoker extends MIDlet implements CommandListener, ServerParent, 
                 // write post-action user code here
             } else if (__selectedString.equals("About")) {//GEN-LINE:|19-action|7|27-preAction
 				// write pre-action user code here
-//GEN-LINE:|19-action|8|27-postAction
+                switchDisplayable(getAlert(), getList());//GEN-LINE:|19-action|8|27-postAction
 				// write post-action user code here
             } else if (__selectedString.equals("Exit")) {//GEN-LINE:|19-action|9|33-preAction
                 // write pre-action user code here
@@ -340,6 +337,32 @@ public class MedoPoker extends MIDlet implements CommandListener, ServerParent, 
         return choiceGroup;
     }
     //</editor-fold>//GEN-END:|45-getter|2|
+
+
+
+    //<editor-fold defaultstate="collapsed" desc=" Generated Getter: alert ">//GEN-BEGIN:|55-getter|0|55-preInit
+    /**
+     * Returns an initiliazed instance of alert component.
+     * @return the initialized component instance
+     */
+    public Alert getAlert() {
+        if (alert == null) {//GEN-END:|55-getter|0|55-preInit
+            // write pre-init user code here
+            alert = new Alert("About", "MedoPoker 0.9\nNejc Saje\nnejc.saje@gmail.com", null, null);//GEN-BEGIN:|55-getter|1|55-postInit
+            alert.setTimeout(Alert.FOREVER);//GEN-END:|55-getter|1|55-postInit
+            // write post-init user code here
+        }//GEN-BEGIN:|55-getter|2|
+        return alert;
+    }
+    //</editor-fold>//GEN-END:|55-getter|2|
+
+
+
+
+
+
+
+
 
 
 
