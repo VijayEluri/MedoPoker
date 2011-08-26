@@ -125,6 +125,28 @@ public class Util {
 
 			if (h1.getRank() == h2.getRank()) {
 				if (h1.getHighest().getRank() == h2.getHighest().getRank()) { //TODO compare individual cards for flush
+					// compare second pairs for two pairs handling
+					if (h1.getRank() == 2) {
+						int h1secondPairRank = h1.getCards()[2].getRank();
+						int h2secondPairRank = h2.getCards()[2].getRank();
+						if (h1secondPairRank < h2secondPairRank) {
+							return -1;
+						} else if (h1secondPairRank > h2secondPairRank) {
+							return 1;
+						}
+					}
+					
+					// flush handling
+					if (h1.getRank() == 5) {
+						for (int i=0; i<h1.getCards().length; i++) {
+							if (h1.getCards()[i].getRank() < h2.getCards()[i].getRank()) {
+								return -1;
+							} else if (h1.getCards()[i].getRank() > h2.getCards()[i].getRank()) {
+								return 1;
+							}
+						}
+					}
+					
 					Card[] c1 = h1.getComplement();
 					Card[] c2 = h2.getComplement();
 					/*for (int i=0; i<c1.length; i++) {
@@ -133,6 +155,7 @@ public class Util {
 						else if (c1[i].getRank() > c2[i].getRank())
 							return 1;
 					}*/
+					if (c1.length == 0 || c2.length == 0) return 0;
                     for (int i=c1.length-1; i>=0; i--) {
 						if (c1[i].getRank() < c2[i].getRank())
 							return -1;

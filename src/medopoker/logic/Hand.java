@@ -20,20 +20,21 @@ public class Hand {
     private Card[] complement; // Cards that fill the hand to 5 cards, e.g. AA is the hand combination, KQJ is saved here as a complement.
 	private Card highest;
 
-	public Hand(int h, Card[] c, Card[] on_table) {
+	public Hand(int h, Card[] c, Card[] all_cards) {
 		hand_type = h;
 		cards = c;
-		complement = pickComplement(c, on_table);
+		complement = pickComplement(c, all_cards);
 		highest = (Card)Util.max(cards, new RankComparator());
 	}
 
 	private Card[] pickComplement(Card[] c, Card[] t) {
 		if (hand_type == 5) {
-            return t;
+            return new Card[]{};
         } else {
             Card[] r = Util.removeCards(t, c);
-            int start = r.length-c.length-1;
-            if (start < 0) start = 0;
+            int start = r.length - 5 + c.length;
+            
+            if (start >= r.length) return new Card[]{};
 
             return Util.subList(r, start, r.length);
         }

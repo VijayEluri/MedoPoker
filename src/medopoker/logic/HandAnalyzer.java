@@ -7,9 +7,9 @@
 
 package medopoker.logic;
 
+import medopoker.logic.Util.Comparator;
 import medopoker.logic.Util.HandComparator;
 import medopoker.logic.Util.RankComparator;
-import medopoker.logic.Util.Comparator;
 
 /**
  *
@@ -66,7 +66,7 @@ public class HandAnalyzer {
 				current = new Hand(1, sub, cards);
 				newPair(current);
 				i += 1;
-                //TODO: checkFullHouse()
+                //TODO: checkFullHouse() - i think this is fixed, not sure though
 			}
 		}
 		
@@ -94,13 +94,30 @@ public class HandAnalyzer {
 				possibleHand(new Hand(4, sub, cards));
 			}
 		}
+		// if last card is ace, check for hands if its in the beginning
+		if (str[str.length-1].getRank() == 12) {
+			// put ace in the beginning
+			Card tmp = str[str.length-1];
+			for (int i=str.length-1; i>0; i--) {
+				str[i] = str[i-1];
+			}
+			str[0] = tmp;
+			
+			//check
+			for (int i=0; i<=(str.length-5); i++) {
+				sub = (Card[])Util.subList(str, i, i+5);
+				if (isStraight(sub)) {
+					possibleHand(new Hand(4, sub, cards));
+				}
+			}
+		}
 
         return highest;
 	}
 	
 	public boolean isStraight(Card[] cards) {
 		for (int i=1; i<cards.length; i++) {
-			if (cards[i].getRank() != cards[i-1].getRank()+1) {
+			if (cards[i].getRank() != (cards[i-1].getRank()+1) % 13) {
 				return false;
 			}
 		}
