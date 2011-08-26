@@ -6,7 +6,7 @@ import com.SpecialK.SpecialKEval.SevenEval;
 
 public class AnalyzerTest {
 	public static void main(String[] args) {
-		for (int i=0; i<1000; i++) {
+		for (int i=0; i<10000; i++) {
 			Card[] deck = Card.getDeck();
 			Card[] player1 = new Card[2];
 			Card[] player2 = new Card[2];

@@ -59,5 +59,9 @@ public class Hand {
 	public String toString() {
 		return HANDS[hand_type];
 	}
+	
+	public void overrideHighest(Card highest) {
+		this.highest = highest; 
+	}
 
 }

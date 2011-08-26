@@ -84,8 +84,8 @@ public class HandAnalyzer {
 
 		// Straight
 		//System.out.println(cards.length);
+		Card.sortByRank(cards);
 		Card[] str = Card.singleRanks(cards);
-		Card.sortByRank(str);
 
 		//System.out.println(str.length);
 		for (int i=0; i<=(str.length-5); i++) {
@@ -107,7 +107,9 @@ public class HandAnalyzer {
 			for (int i=0; i<=(str.length-5); i++) {
 				sub = (Card[])Util.subList(str, i, i+5);
 				if (isStraight(sub)) {
-					possibleHand(new Hand(4, sub, cards));
+					Hand h = new Hand(4, sub, cards);
+					h.overrideHighest(sub[sub.length-1]);
+					possibleHand(h);
 				}
 			}
 		}
@@ -153,7 +155,18 @@ public class HandAnalyzer {
             highest_TOAK = hand;
             possibleHand(hand);
             checkFullHouse();
-        } else {
+        } else {        	
+        	Hand toPair = hand;
+        	Hand toTOAK = highest_TOAK;
+        	if (hand.getHighest().getRank() > highest_TOAK.getHighest().getRank()) {
+        		toPair = highest_TOAK;
+        		toTOAK = hand;
+        	}
+        	Card[] ttp = new Card[]{toPair.getCards()[0], toPair.getCards()[1]}; // three to pair
+        	Hand h = new Hand(6, Util.concat(toTOAK.getCards(), ttp), cards);
+        	h.overrideHighest(toTOAK.getCards()[0]);
+        	possibleHand(h);
+        	
 			if ((new HandComparator()).compare(hand, highest_TOAK) == 1) {
 				highest_TOAK = hand;
                 possibleHand(hand);
@@ -164,7 +177,9 @@ public class HandAnalyzer {
 
 	private void checkFullHouse() {
 		if (highest_pair != null && highest_TOAK != null) {
-			possibleHand(new Hand(6, Util.concat(highest_TOAK.getCards(), highest_pair.getCards()), cards));
+			Hand h = new Hand(6, Util.concat(highest_TOAK.getCards(), highest_pair.getCards()), cards);
+			h.overrideHighest(highest_TOAK.getCards()[0]);
+			possibleHand(h);
 		}
 	}
 

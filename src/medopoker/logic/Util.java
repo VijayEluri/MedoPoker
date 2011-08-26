@@ -124,7 +124,7 @@ public class Util {
 			Hand h2 = (Hand)o2;
 
 			if (h1.getRank() == h2.getRank()) {
-				if (h1.getHighest().getRank() == h2.getHighest().getRank()) { //TODO compare individual cards for flush
+				if (h1.getHighest().getRank() == h2.getHighest().getRank()) {
 					// compare second pairs for two pairs handling
 					if (h1.getRank() == 2) {
 						int h1secondPairRank = h1.getCards()[2].getRank();
@@ -138,12 +138,23 @@ public class Util {
 					
 					// flush handling
 					if (h1.getRank() == 5) {
-						for (int i=0; i<h1.getCards().length; i++) {
+						for (int i=h1.getCards().length-1; i>=0; i--) {
 							if (h1.getCards()[i].getRank() < h2.getCards()[i].getRank()) {
 								return -1;
 							} else if (h1.getCards()[i].getRank() > h2.getCards()[i].getRank()) {
 								return 1;
 							}
+						}
+					}
+					
+					// full house handling
+					if (h1.getRank() == 6) {
+						int pairRank1 = h1.getCards()[3].getRank();
+						int pairRank2 = h2.getCards()[3].getRank();
+						if (pairRank1 < pairRank2) {
+							return -1;
+						} else if (pairRank1 > pairRank2) {
+							return 1;
 						}
 					}
 					
