@@ -2,7 +2,9 @@ MedoPoker
 
 J2ME game of poker, using bluetooth to connect up to 4 players.
 
-If you make any changes or improvements, please contact me (sheer curiosity).
+If you make any changes or improvements, please contact me (just curious).
+
+AnalyzerTest class needs SpecialK library (https://github.com/SpecialK/SpecialKEval). You can probably just delete src/medopoker/logic/AnalyzerTest.java to just compile and run the game.
 
 Copyright 2010 Nejc Saje
 nejc.saje@gmail.com
